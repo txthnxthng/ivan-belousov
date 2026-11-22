@@ -15,8 +15,8 @@ order: 1
 
 Добавь материалы в `public/media/the-bridge/`, затем укажи их в Markdown:
 
-`![Инсталляция](media/the-bridge/photo.webp)`
+`![Инсталляция](media/the-bridge/photos/installation-view.webp)`
 
 Для видео используй специальную строку:
 
-`::video{src="media/the-bridge/documentation.mp4"}`
+`::video{src="media/the-bridge/videos/documentation.mp4"}`

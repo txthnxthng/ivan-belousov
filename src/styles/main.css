@@ -5,6 +5,8 @@ body { background: #fff; color: #101010; }
 #app { min-height: 100vh; padding: clamp(18px, 4vw, 54px); padding-top: clamp(30px, 8vh, 90px); font-size: clamp(14px, 1.15vw, 17px); line-height: 1.55; }
 #history { max-width: min(980px, 100%); }
 .command-history { white-space: pre-wrap; overflow-wrap: anywhere; margin: 1.2em 0 .5em; }
+.command-list { list-style: none; padding: 0; }
+.terminal-command { border: 0; padding: 0; background: none; color: inherit; font: inherit; text-align: left; overflow-wrap: anywhere; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .terminal-output { max-width: 900px; margin: .4em 0 1.25em; }
 .terminal-output.plain { white-space: pre-wrap; overflow-wrap: anywhere; }
 .markdown h1, .markdown h2, .markdown h3 { font-size: 1em; line-height: 1.55; margin: 1em 0 .3em; font-weight: 700; }
@@ -12,7 +14,11 @@ body { background: #fff; color: #101010; }
 .markdown p { margin: .4em 0 .9em; }
 .markdown a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
 .markdown blockquote { border-left: 2px solid #111; margin-left: 0; padding-left: 1em; }
-.markdown img, .terminal-media { display: block; max-width: min(780px, 100%); height: auto; margin: 1.5em 0; }
+.terminal-media { display: block; max-width: min(780px, 100%); height: auto; margin: 1.5em 0; }
+.terminal-photo { display: block; position: relative; width: fit-content; max-width: min(325px, 100%); margin: 1.5em 0; }
+.terminal-photo[hidden] { display: none; }
+.terminal-photo img { display: block; max-width: 100%; height: auto; }
+.photo-cursor { position: absolute; left: 0; top: 0; pointer-events: none; }
 .markdown code { font-family: inherit; background: #f1f1f1; padding: .05em .2em; }
 .markdown pre { overflow-x: auto; padding: 1em; background: #f7f7f7; }
 #prompt { display: flex; align-items: baseline; gap: .7ch; width: 100%; max-width: 980px; margin: 1.1em 0; cursor: text; }
@@ -21,8 +27,10 @@ body { background: #fff; color: #101010; }
 #visual-input { min-height: 1.55em; white-space: pre; overflow: hidden; text-overflow: clip; pointer-events: none; }
 #real-input { position: absolute; z-index: 1; inset: 0; width: 100%; height: 100%; padding: 0; margin: 0; font: inherit; color: transparent; background: transparent; border: 0; outline: 0; caret-color: transparent; -webkit-text-fill-color: transparent; }
 #real-input::selection { background: transparent; }
-.block-cursor { display: inline-block; min-width: 1ch; line-height: 1.2; color: #fff; background: #101010; vertical-align: baseline; animation: blink-block 1s steps(1,end) infinite; }
-@keyframes blink-block { 0%, 49% { color: white; background: #101010; } 50%, 100% { color: #101010; background: transparent; } }
+.block-cursor { display: inline-block; min-width: 1ch; line-height: 1.2; color: #fff; background: #101010; vertical-align: baseline; animation: breathe-block 1.6s ease-in-out infinite; }
+@keyframes breathe-block { 0%, 100% { opacity: 1; } 50% { opacity: .12; } }
+#input-hint { color: #b7b7b7; margin-left: .25ch; white-space: normal; }
+#input-hint .terminal-command { position: relative; z-index: 2; pointer-events: auto; }
 .artwork-overlay { position: fixed; z-index: 20; inset: 0; background: #fff; }
 .artwork-overlay canvas { display: block; width: 100%; height: 100%; }
 .artwork-overlay button { position: absolute; top: 22px; right: 24px; background: #fff; border: 1px solid #111; padding: 9px 14px; font: inherit; cursor: pointer; }

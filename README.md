@@ -21,9 +21,41 @@ npm run dev
 
 ## Как редактировать содержание
 
-Изменяйте Markdown-файлы в `src/content/ru/` и `src/content/en/`. Метаданные в YAML между строками `---` определяют id, заголовок, год и порядок. Изображения кладите в `public/media/...` и вставляйте как `![Описание](media/путь.webp)`. Видео: отдельная строка `::video{src="media/путь.mp4"}`.
+Изменяйте Markdown-файлы в `src/content/ru/` и `src/content/en/`. Метаданные в YAML между строками `---` определяют `id`, заголовок, год и порядок проекта.
 
-Всё, что в `public/`, доступно из корня сайта: в Markdown пишите `media/...` без `/` в начале. Сборка автоматически учитывает префикс GitHub Pages.
+## Фото и видео
+
+В `public/media/` у каждого проекта своя папка с именем, совпадающим с его `id` в Markdown. Для команды `главная` используется папка `statement`, для `cv` — папка `cv`. Русская и английская версии страницы могут использовать одни и те же файлы.
+
+```text
+public/media/
+├── statement/
+│   ├── photos/
+│   └── videos/
+├── cv/
+│   ├── photos/
+│   └── videos/
+├── the-bridge/
+│   ├── photos/
+│   └── videos/
+└── non-zero-sum-game/
+    ├── photos/
+    └── videos/
+```
+
+Храните здесь версии для сайта. Для фото подойдут WebP или JPEG, для видео — MP4 с H.264. Используйте короткие названия латиницей, в нижнем регистре, с дефисами вместо пробелов.
+
+Например, положите `installation-view.webp` в `public/media/the-bridge/photos/`, а `documentation.mp4` — в `public/media/the-bridge/videos/`. В файле проекта укажите:
+
+```md
+![Общий вид инсталляции](media/the-bridge/photos/installation-view.webp)
+
+::video{src="media/the-bridge/videos/documentation.mp4"}
+```
+
+Путь начинается с `media/` без начального слеша и без `public/`. Директива видео должна стоять на отдельной строке без обратных кавычек. Файлы `.gitkeep` сохраняют пустые папки в Git.
+
+Для фото на главной укажите в `src/content/ru/statement.md` путь вида `media/statement/photos/portrait.webp`. Для видео в CV укажите в `src/content/ru/cv.md` путь вида `media/cv/videos/interview.mp4`.
 
 ## Добавление команд
 

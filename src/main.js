@@ -9,8 +9,8 @@ app.innerHTML = `
   <form id="prompt" autocomplete="off">
     <span aria-hidden="true" class="prompt-sign">&gt;</span>
     <div class="input-shell">
-      <div id="visual-input" aria-hidden="true"><span id="before"></span><span id="cursor" class="block-cursor"> </span><span id="after"></span></div>
-      <input id="real-input" aria-label="Terminal command" type="text" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" />
+      <div id="visual-input"><span id="before" aria-hidden="true"></span><span id="cursor" class="block-cursor" aria-hidden="true"> </span><span id="after" aria-hidden="true"></span><span id="input-hint">Введите <button class="terminal-command" type="button" data-command="меню">«меню»</button>, чтобы посмотреть список команд.</span></div>
+      <input id="real-input" aria-label="Terminal command" aria-describedby="input-hint" type="text" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" />
     </div>
   </form>`;
 
@@ -20,6 +20,7 @@ const input = document.getElementById('real-input');
 const before = document.getElementById('before');
 const after = document.getElementById('after');
 const cursor = document.getElementById('cursor');
+const hint = document.getElementById('input-hint');
 const output = new Output(historyElement);
 const registry = new CommandRegistry();
 const commandHistory = [];
@@ -41,12 +42,30 @@ function drawInput() {
   const char = value[pos] || ' ';
   cursor.textContent = char;
   after.textContent = value.slice(pos + (value[pos] ? 1 : 0));
+  hint.hidden = value.length > 0;
 }
 input.addEventListener('input', drawInput);
 input.addEventListener('click', drawInput);
 input.addEventListener('keyup', drawInput);
 input.addEventListener('select', drawInput);
 form.addEventListener('click', () => input.focus());
+app.addEventListener('click', (event) => {
+  const button = event.target.closest('button[data-command]');
+  if (!button) return;
+  input.value = button.dataset.command;
+  historyPosition = commandHistory.length;
+  input.focus();
+  input.setSelectionRange(input.value.length, input.value.length);
+  drawInput();
+  output.scroll();
+});
+// Клик по свободному месту страницы переводит фокус в командную строку.
+// Не перехватываем ссылки, видео, выделение текста и элементы произведений.
+app.addEventListener('pointerdown', (event) => {
+  if (event.target.closest('a, button, input, textarea, select, video, audio, [contenteditable], .artwork-overlay')) return;
+  if (window.getSelection()?.toString()) return;
+  requestAnimationFrame(() => input.focus({ preventScroll: true }));
+});
 
 async function submit(raw, record = true) {
   const value = raw.trim();
@@ -81,17 +100,22 @@ input.addEventListener('keydown', (event) => {
     input.setSelectionRange(input.value.length, input.value.length);
     drawInput();
   } else if (event.key === 'Tab') {
-    event.preventDefault();
     const names = registry.entries().map((command) => command.name);
     const matches = names.filter((name) => name.startsWith(input.value));
-    if (matches.length === 1) { input.value = `${matches[0]} `; drawInput(); }
+    if (!event.shiftKey && matches.length === 1) {
+      event.preventDefault();
+      input.value = `${matches[0]} `;
+      drawInput();
+    }
   } else if (event.key === 'Escape' && artworkStop) artworkStop();
 });
 
 function routeFromHash() {
   const path = decodeURIComponent(location.hash.replace(/^#\/?/, ''));
-  if (path.startsWith('project/')) return `open ${path.slice('project/'.length)}`;
-  if (path === 'statement') return 'statement';
+  if (path === 'project/the-bridge') return 'мост';
+  if (path === 'project/non-zero-sum-game') return 'игра с ненулевой суммой';
+  if (path === 'statement') return 'главная';
+  if (path === 'cv') return 'cv';
   return null;
 }
 window.addEventListener('hashchange', () => {
@@ -100,7 +124,11 @@ window.addEventListener('hashchange', () => {
   if (command) void submit(command, false);
 });
 drawInput();
-const initialRoute = routeFromHash();
-if (initialRoute) void submit(initialRoute, false);
+if (performance.getEntriesByType('navigation')[0]?.type === 'reload') {
+  if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+} else {
+  const initialRoute = routeFromHash();
+  if (initialRoute) void submit(initialRoute, false);
+}
 // Desktop starts ready to type; on mobile don't force the virtual keyboard open.
 if (window.matchMedia('(pointer: fine)').matches) input.focus();
