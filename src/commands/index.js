@@ -8,7 +8,7 @@ export function registerCommands(registry, site) {
   ]);
 
   registry.register('меню', 'список команд', ({ output, signal }) => {
-    return output.commands(registry.entries().map(({ name }) => name).filter((name) => name !== 'демо'), signal);
+    return output.commands(['главная', 'cv', 'архив проектов', 'демо', 'очистить'], signal);
   });
 
   registry.register('архив проектов', 'список проектов', async ({ output, signal }) => {
@@ -45,6 +45,5 @@ export function registerCommands(registry, site) {
     site.navigate('');
   });
 
-  // Техническая команда для проверки интерактивных модулей (в меню не показываем).
   registry.register('демо', 'тест Canvas', async () => site.startArtwork(startDemo));
 }

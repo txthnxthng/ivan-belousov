@@ -160,11 +160,24 @@ export class Output {
     };
     for (const line of lines) {
       const video = line.trim().match(/^::video\{src="([^"]+)"\}$/);
+      const youtube = line.trim().match(/^::youtube\{id="([\w-]{11})"(?: start="(\d+)")?\}$/);
       const artwork = line.trim().match(/^::artwork\{id="([^"]+)"\}$/);
-      if (video || artwork) {
+      if (video || youtube || artwork) {
         await flush();
         if (signal?.aborted) return;
-        if (video) {
+        if (youtube) {
+          const [, id, start] = youtube;
+          const url = new URL(`https://www.youtube.com/embed/${id}`);
+          url.searchParams.set('playsinline', '1');
+          if (start) url.searchParams.set('start', start);
+          const player = document.createElement('iframe');
+          player.src = url.href;
+          player.title = 'Видеоплеер YouTube';
+          player.className = 'terminal-media youtube-player';
+          player.allowFullscreen = true;
+          player.referrerPolicy = 'strict-origin-when-cross-origin';
+          this.root.append(player);
+        } else if (video) {
           const player = document.createElement('video');
           player.src = asset(video[1]); player.controls = true; player.preload = 'metadata';
           player.className = 'terminal-media';
