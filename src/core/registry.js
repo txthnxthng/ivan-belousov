@@ -1,17 +1,25 @@
 export class CommandRegistry {
   #commands = new Map();
+
   register(name, description, execute) {
-    if (this.#commands.has(name)) throw new Error(`Command already exists: ${name}`);
-    this.#commands.set(name, { name, description, execute });
+    const key = name.trim().toLocaleLowerCase('ru-RU').replace(/\s+/g, ' ');
+    if (this.#commands.has(key)) throw new Error(`Command already exists: ${key}`);
+    this.#commands.set(key, { name: key, description, execute });
   }
-  entries() { return Array.from(this.#commands.values()); }
+
+  entries() { return [...this.#commands.values()]; }
+
   async execute(raw, context) {
-    const [name, ...args] = raw.trim().split(/\s+/);
-    const command = this.#commands.get(name.toLowerCase());
-    if (!command) {
-      await context.output.text(`command not found: ${name}\ntype 'help' for available commands.`, context.signal);
+    const normalized = raw.trim().toLocaleLowerCase('ru-RU').replace(/\s+/g, ' ');
+    // Match the longest registered command: supports commands containing spaces.
+    const match = [...this.#commands.values()]
+      .sort((a, b) => b.name.length - a.name.length)
+      .find(({ name }) => normalized === name || normalized.startsWith(`${name} `));
+    if (!match) {
+      await context.output.text(`Команда не найдена: ${raw.trim()}\nВведите «меню», чтобы посмотреть список команд.`, context.signal);
       return;
     }
-    await command.execute({ args, ...context });
+    const rest = normalized.slice(match.name.length).trim();
+    await match.execute({ args: rest ? rest.split(' ') : [], ...context });
   }
 }

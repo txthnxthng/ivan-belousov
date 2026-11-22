@@ -19,6 +19,7 @@ export function getContent(language = 'ru') {
     documents,
     projects,
     statement: documents.find((item) => item.path === 'statement.md'),
+    cv: documents.find((item) => item.path === 'cv.md'),
     project: (id) => projects.find((item) => item.metadata.id === id),
   };
 }
